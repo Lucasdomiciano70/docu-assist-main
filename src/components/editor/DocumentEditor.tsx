@@ -109,6 +109,10 @@ export const DocumentEditor = ({ templateId, onSave, onPreview, onSend }: Docume
       const regex = new RegExp(`{{${field.key}}}`, 'g')
       preview = preview.replace(regex, field.value || `[${field.label}]`)
     })
+    
+    // Replace any remaining undefined placeholders to prevent ReferenceError
+    preview = preview.replace(/\{\{([^}]+)\}\}/g, '[Campo não definido: $1]')
+    
     return preview
   }
 
