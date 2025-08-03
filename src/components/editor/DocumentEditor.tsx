@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Save, Eye, Send, FileText } from 'lucide-react'
 import { toast } from '@/components/ui/sonner'
+import DOMPurify from 'dompurify'
 
 interface DocumentField {
   key: string
@@ -113,7 +114,13 @@ export const DocumentEditor = ({ templateId, onSave, onPreview, onSend }: Docume
     // Replace any remaining undefined placeholders to prevent ReferenceError
     preview = preview.replace(/\{\{([^}]+)\}\}/g, '[Campo não definido: $1]')
     
-    return preview
+    // Sanitize HTML to remove any script tags or executable JavaScript
+    return DOMPurify.sanitize(preview, {
+      ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'table', 'tr', 'td', 'th', 'thead', 'tbody', 'div', 'span'],
+      ALLOWED_ATTR: ['class', 'style'],
+      FORBID_TAGS: ['script', 'object', 'embed', 'link', 'style'],
+      FORBID_ATTR: ['onclick', 'onload', 'onerror', 'onmouseover', 'onfocus', 'onblur']
+    })
   }
 
   const handleSave = async () => {
