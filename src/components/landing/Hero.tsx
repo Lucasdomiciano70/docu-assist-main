@@ -7,11 +7,7 @@ const Hero = () => {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src={heroImage} 
-          alt="Professional digital signature platform" 
-          className="w-full h-full object-cover"
-        />
+        <div className="w-full h-full bg-gradient-to-br from-primary to-secondary"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/80 to-secondary/90"></div>
       </div>
 

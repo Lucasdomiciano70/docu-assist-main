@@ -10,7 +10,6 @@ import {
   Smartphone,
   CheckCircle
 } from "lucide-react";
-import documentsImage from "@/assets/document-templates.jpg";
 
 const Features = () => {
   const features = [
@@ -149,11 +148,9 @@ const Features = () => {
           
           <div className="relative">
             <div className="relative rounded-2xl overflow-hidden shadow-strong">
-              <img 
-                src={documentsImage} 
-                alt="Templates de documentos profissionais" 
-                className="w-full h-auto"
-              />
+              <div className="w-full h-80 bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                <FileText className="h-20 w-20 text-primary/50" />
+              </div>
               <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
             </div>
             

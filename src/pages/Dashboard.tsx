@@ -249,8 +249,12 @@ const Dashboard = () => {
                     <Button variant="ghost" size="sm">
                       <Download className="h-4 w-4" />
                     </Button>
-                    {doc.status === 'draft' && (
-                      <Button variant="ghost" size="sm">
+                    {(doc.status === 'draft' || doc.status === 'pending') && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => navigate('/signatures', { state: { document: doc } })}
+                      >
                         <Send className="h-4 w-4" />
                       </Button>
                     )}

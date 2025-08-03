@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Templates from "./pages/Templates";
 import Editor from "./pages/Editor";
+import Signatures from "./pages/Signatures";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,11 @@ const App = () => (
             <Route path="/editor" element={
               <ProtectedRoute>
                 <Editor />
+              </ProtectedRoute>
+            } />
+            <Route path="/signatures" element={
+              <ProtectedRoute>
+                <Signatures />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

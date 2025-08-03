@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Save, Eye, Send, FileText } from 'lucide-react'
 import { toast } from '@/components/ui/sonner'
@@ -87,6 +86,21 @@ export const DocumentEditor = ({ templateId, onSave, onPreview, onSend }: Docume
           { key: 'cidade', label: 'Cidade', value: '', type: 'text' },
           { key: 'data', label: 'Data', value: new Date().toLocaleDateString('pt-BR'), type: 'date' }
         ]
+      },
+      '2': {
+        title: 'Acordo de Confidencialidade (NDA)',
+        content: `<h2>ACORDO DE CONFIDENCIALIDADE</h2>
+<p><strong>PARTE REVELADORA:</strong> {{nome_reveladora}}</p>
+<p><strong>PARTE RECEPTORA:</strong> {{nome_receptora}}</p>
+<h3>CLÁUSULA 1ª - DEFINIÇÕES</h3>
+<p>Para os fins deste acordo, "Informação Confidencial" significa toda e qualquer informação...</p>
+<h3>CLÁUSULA 2ª - OBRIGAÇÕES</h3>
+<p>A PARTE RECEPTORA compromete-se a manter em sigilo absoluto todas as informações...</p>`,
+        fields: [
+          { key: 'nome_reveladora', label: 'Nome da Parte Reveladora', value: '', type: 'text' },
+          { key: 'nome_receptora', label: 'Nome da Parte Receptora', value: '', type: 'text' },
+          { key: 'data', label: 'Data', value: new Date().toLocaleDateString('pt-BR'), type: 'date' }
+        ]
       }
     }
 
@@ -105,22 +119,31 @@ export const DocumentEditor = ({ templateId, onSave, onPreview, onSend }: Docume
   }
 
   const getPreviewContent = () => {
-    let preview = content
-    fields.forEach(field => {
-      const regex = new RegExp(`{{${field.key}}}`, 'g')
-      preview = preview.replace(regex, field.value || `[${field.label}]`)
-    })
-    
-    // Replace any remaining undefined placeholders to prevent ReferenceError
-    preview = preview.replace(/\{\{([^}]+)\}\}/g, '[Campo não definido: $1]')
-    
-    // Sanitize HTML to remove any script tags or executable JavaScript
-    return DOMPurify.sanitize(preview, {
-      ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'table', 'tr', 'td', 'th', 'thead', 'tbody', 'div', 'span'],
-      ALLOWED_ATTR: ['class', 'style'],
-      FORBID_TAGS: ['script', 'object', 'embed', 'link', 'style'],
-      FORBID_ATTR: ['onclick', 'onload', 'onerror', 'onmouseover', 'onfocus', 'onblur']
-    })
+    try {
+      let preview = content
+      
+      // Replace all field placeholders with their values
+      fields.forEach(field => {
+        const regex = new RegExp(`\\{\\{${field.key}\\}\\}`, 'g')
+        preview = preview.replace(regex, field.value || `[${field.label}]`)
+      })
+      
+      // Replace any remaining undefined placeholders to prevent ReferenceError
+      preview = preview.replace(/\{\{([^}]+)\}\}/g, '[Campo não definido: $1]')
+      
+      // Sanitize HTML to remove any script tags or executable JavaScript
+      const sanitized = DOMPurify.sanitize(preview, {
+        ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'table', 'tr', 'td', 'th', 'thead', 'tbody', 'div', 'span'],
+        ALLOWED_ATTR: ['class', 'style'],
+        FORBID_TAGS: ['script', 'object', 'embed', 'link', 'style'],
+        FORBID_ATTR: ['onclick', 'onload', 'onerror', 'onmouseover', 'onfocus', 'onblur']
+      })
+      
+      return sanitized
+    } catch (error) {
+      console.error('Error processing preview content:', error)
+      return '<p>Erro ao processar conteúdo</p>'
+    }
   }
 
   const handleSave = async () => {
@@ -143,6 +166,7 @@ export const DocumentEditor = ({ templateId, onSave, onPreview, onSend }: Docume
       onSave(document)
       toast.success('Documento salvo com sucesso!')
     } catch (error) {
+      console.error('Error saving document:', error)
       toast.error('Erro ao salvar documento')
     } finally {
       setIsSaving(false)
@@ -150,21 +174,31 @@ export const DocumentEditor = ({ templateId, onSave, onPreview, onSend }: Docume
   }
 
   const handlePreview = () => {
-    const document = {
-      title,
-      content: getPreviewContent(),
-      fields
+    try {
+      const document = {
+        title,
+        content: getPreviewContent(),
+        fields
+      }
+      onPreview(document)
+    } catch (error) {
+      console.error('Error generating preview:', error)
+      toast.error('Erro ao gerar pré-visualização')
     }
-    onPreview(document)
   }
 
   const handleSend = () => {
-    const document = {
-      title,
-      content: getPreviewContent(),
-      fields
+    try {
+      const document = {
+        title,
+        content: getPreviewContent(),
+        fields
+      }
+      onSend(document)
+    } catch (error) {
+      console.error('Error sending document:', error)
+      toast.error('Erro ao enviar documento')
     }
-    onSend(document)
   }
 
   return (
